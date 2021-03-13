@@ -80,9 +80,11 @@ export default class Shell {
 
                         const { env } = process;
 
+                        env.SHELL = existsSync("/bin/bash") ? "/bin/bash" : process.env.SHELL || "sh";
                         env.MAIL = `/var/mail/${credentials.username}`;
                         env.USER = credentials.username;
                         env.HOME = `/home/${credentials.username}`;
+                        env.PWD = env.HOME;
                         env.LOGNAME = credentials.username;
 
                         const keys = Object.keys(env);
@@ -91,7 +93,7 @@ export default class Shell {
                             if (keys[i].toLowerCase().indexOf("sudo") >= 0) delete env[keys[i]];
                         }
 
-                        const shell = spawn(existsSync("/bin/bash") ? "/bin/bash" : process.env.SHELL || "sh", [], {
+                        const shell = spawn(env.SHELL, [], {
                             name: "xterm-color",
                             cwd: existsSync(`/home/${credentials.username}`) ? `/home/${credentials.username}` : "/",
                             env: <{ [key: string]: string }>env,
@@ -130,7 +132,7 @@ export default class Shell {
                             this.hide = false;
 
                             shell.write("\r");
-                        }, 500);
+                        }, 1000);
 
                         shell.onData((data: any) => {
                             if (!this.hide) socket.emit("shell_output", data);
