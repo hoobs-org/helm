@@ -1,0 +1,8 @@
+#!/bin/sh
+
+cd /usr/lib/helm
+yarn install --force --production
+
+systemctl daemon-reload
+systemctl enable helm.service
+systemctl start helm.service
