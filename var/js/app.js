@@ -102,6 +102,17 @@ class Shell {
             },
         });
 
+        document.addEventListener("contextmenu", (event) => {
+            event.preventDefault();
+
+            if (this.term.hasSelection()) document.execCommand("copy");
+
+            this.term.select(0, 0, 0);
+
+            return false;
+        });
+
+        this.term.attachCustomKeyEventHandler((event) => (event.key === "v" && event.ctrlKey) ? false : true);
         this.screen = new FitAddon.FitAddon();
 
         this.term.loadAddon(this.screen);
