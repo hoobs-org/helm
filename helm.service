@@ -8,7 +8,6 @@ User=root
 ExecStart=/usr/bin/helm shell --port 9090
 Restart=always
 RestartSec=3
-KillMode=process
 
 [Install]
 WantedBy=multi-user.target
