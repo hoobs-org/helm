@@ -1,6 +1,6 @@
 {
     "name": "helm",
-    "version": "1.2.4",
+    "version": "1.2.5",
     "description": "Recovery and remote terminal for the Raspberry Pi.",
     "license": "GPL-3.0",
     "repository": {
@@ -17,7 +17,7 @@
     "scripts": {
         "build": "bin/build --lint",
         "lint": "eslint 'src/**/*.ts'",
-        "serve": "bin/debug build"
+        "debug": "bin/debug build"
     },
     "dependencies": {
         "@hoobs/pam": "^1.0.5",
