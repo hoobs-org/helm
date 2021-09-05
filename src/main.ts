@@ -27,8 +27,7 @@ export = function Daemon(): void {
     Program.version(State.version, "-v, --version", "output the current version");
     Program.allowUnknownOption();
 
-    Program.option("-m, --mode <mode>", "set the enviornment", (mode: string) => { State.mode = mode; })
-        .option("-d, --debug", "turn on debug level logging", () => { State.debug = true; });
+    Program.option("-d, --debug", "turn on debug level logging", () => { State.debug = true; });
 
     Program.command("shell", { isDefault: true })
         .description("start the helm service")

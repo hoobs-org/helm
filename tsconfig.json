@@ -12,7 +12,7 @@
         "declaration": true,
         "declarationMap": true,
         "sourceMap": true,
-        "outDir": "./lib/helm",
+        "outDir": "./cache/helm",
         "rootDir": "./src",
         "strict": true,
         "esModuleInterop": true,
@@ -23,6 +23,8 @@
     ],
     "exclude": [
         "**/*.test.js",
-        "static/*"
+        "cache/*",
+        "debug",
+        "main"
     ]
 }

@@ -1,0 +1,111 @@
+#!/bin/bash
+
+version() {
+    case $1 in
+        nodesource )  echo `node -e 'console.log(require("./package.json").engines.nodesource)'`
+                      ;;
+
+        * )           echo `node -e 'console.log(require("./package.json").version)'`
+                      ;;
+    esac
+}
+
+debug() {
+    make reset
+
+    ./node_modules/.bin/nodemon --watch src --watch var --ext ts,js,html,css --delay 5 --signal SIGINT --exec "./node_modules/.bin/tsc && sudo ./debug -d"
+}
+
+include() {
+    if [[ -f "../repo/debian/pool/main/h/helm/helm$2_$3.deb" ]]; then
+        echo "$2-$3 already published"
+    else
+        case $1 in
+            stable )    reprepro -b ../repo/debian includedeb bleeding builds/helm-$2-hoobs-$3.deb
+                        reprepro -b ../repo/debian includedeb edge builds/helm-$2-hoobs-$3.deb
+                        reprepro -b ../repo/debian includedeb stable builds/helm-$2-hoobs-$3.deb
+                        ;;
+
+            edge )      reprepro -b ../repo/debian includedeb bleeding builds/helm-$2-hoobs-$3.deb
+                        reprepro -b ../repo/debian includedeb edge builds/helm-$2-hoobs-$3.deb
+                        ;;
+
+            bleeding )  reprepro -b ../repo/debian includedeb bleeding builds/helm-$2-hoobs-$3.deb
+                        ;;
+
+            * )         ;;
+        esac
+    fi
+}
+
+publish() {
+    current=$(version)
+
+    case $1 in
+        stable )    include "stable" "$current" "amd64"
+                    include "stable" "$current" "arm64"
+                    include "stable" "$current" "armhf"
+                    ;;
+
+        edge )      include "edge" "$current" "amd64"
+                    include "edge" "$current" "arm64"
+                    include "edge" "$current" "armhf"
+                    ;;
+
+        bleeding )  include "bleeding" "$current" "amd64"
+                    include "bleeding" "$current" "arm64"
+                    include "bleeding" "$current" "armhf"
+                    ;;
+
+        list )      list $2
+                    ;;
+
+        * )         ;;
+    esac
+}
+
+list() {
+    case $1 in
+        stable )    reprepro -b ../repo/debian list stable helm
+                    ;;
+
+        edge )      reprepro -b ../repo/debian list edge helm
+                    ;;
+
+        bleeding )  reprepro -b ../repo/debian list bleeding helm
+                    ;;
+
+        * )         reprepro -b ../repo/debian list stable helm
+                    reprepro -b ../repo/debian list edge helm
+                    reprepro -b ../repo/debian list bleeding helm
+                    ;;
+    esac
+}
+
+build () {
+    make helm-amd64
+    make helm-arm64
+    make helm-armhf
+}
+
+case $1 in
+    version )  version
+               ;;
+
+    lint )     make lint
+               ;;
+
+    debug )    debug
+               ;;
+
+    build )    build
+               ;;
+
+    publish )  publish $2 $3
+               ;;
+
+    clean )    make clean
+               ;;
+
+    * )        ;;
+esac
