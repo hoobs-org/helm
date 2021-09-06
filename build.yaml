@@ -67,6 +67,11 @@ steps:
     - dpkg
     - wget
     - curl
+    - tar
+    - git
+    - make
+    - gcc
+    - g++
     - __LINUX_IMAGE__
     tag: /
     unless: rootfs_unpacked
@@ -75,34 +80,6 @@ steps:
     shell: |
       mount -t proc /proc proc/
       apt-get -y install python3-minimal
-    unless: rootfs_unpacked
-
-  - chroot: /
-    shell: |
-      curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor | tee /usr/share/keyrings/nodesource.gpg > /dev/null
-    unless: rootfs_unpacked
-
-  - create-file: /etc/apt/sources.list.d/nodesource.list
-    contents: |
-      deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/__NODE_REPO__ __RELEASE__ main
-      deb-src [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/__NODE_REPO__ __RELEASE__ main
-    unless: rootfs_unpacked
-
-  - chroot: /
-    shell: |
-      apt-get update
-    unless: rootfs_unpacked
-
-  - apt: install
-    packages:
-    - tar
-    - git
-    - make
-    - gcc
-    - g++
-    - libpam-dev
-    - nodejs
-    tag: /
     unless: rootfs_unpacked
 
   - create-dir: /var/build
@@ -128,6 +105,31 @@ steps:
 
   - cache-rootfs: /
     unless: rootfs_unpacked
+
+  - chroot: /
+    shell: |
+      curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor | tee /usr/share/keyrings/nodesource.gpg > /dev/null
+      curl -s https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /usr/share/keyrings/yarn.gpg > /dev/null
+
+  - create-file: /etc/apt/sources.list.d/nodesource.list
+    contents: |
+      deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/__NODE_REPO__ __RELEASE__ main
+      deb-src [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/__NODE_REPO__ __RELEASE__ main
+
+  - create-file: /etc/apt/sources.list.d/yarn.list
+    contents: |
+      deb [signed-by=/usr/share/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian stable main
+
+  - chroot: /
+    shell: |
+      apt-get update
+
+  - apt: install
+    packages:
+    - libpam-dev
+    - nodejs
+    - yarn
+    tag: /
 
   - copy-file: /var/build/usr/lib/systemd/system/helm.service
     src: helm.service
@@ -155,8 +157,9 @@ steps:
 
   - chroot: /
     shell: |
-      (cd /var/build/usr/lib/helm && npm install --unsafe-perm)
+      (cd /var/build/usr/lib/helm && yarn install)
       (cd /var && dpkg-deb --build build)
+      ls -la /var/build/usr/lib/helm/node_modules/node-pty/build/Release/
 
   - shell: |
       cp "${ROOT?}/var/build.deb" "builds/helm-__VERSION__-hoobs-__ARCH__.deb"
