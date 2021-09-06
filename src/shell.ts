@@ -66,20 +66,10 @@ export default class Shell {
         this.shells = [];
         this.hide = false;
 
-        this.app.use(CORS({
-            origin: "*",
-            credentials: false,
-        }));
-
+        this.app.use(CORS({ origin: "*", credentials: false }));
         this.server = HTTP.createServer(this.app);
         this.listner = createHttpTerminator({ server: this.server });
-
-        this.io = new IO.Server(this.server, {
-            cors: {
-                origin: "*",
-                credentials: false,
-            },
-        });
+        this.io = new IO.Server(this.server, { cors: { origin: "*", credentials: false } });
 
         this.io?.on("connection", (socket: IO.Socket): void => {
             socket.on("shell_connect", (credentials: any) => {
@@ -148,14 +138,14 @@ export default class Shell {
                             const groups = this.groups(credentials.username);
 
                             for (let i = 0; i < groups.length; i += 1) {
-                                shell.write(`newgrp ${groups[i]}\r`);
+                                shell.write(` newgrp ${groups[i]}\r`);
                             }
 
-                            shell.write(`newgrp ${credentials.username}\r`);
-                            shell.write("clear\r");
+                            shell.write(` newgrp ${credentials.username}\r`);
+                            shell.write(" clear\r");
 
                             for (let i = 0; i < profiles.length; i += 1) {
-                                if (existsSync(profiles[i].replace(/{{USER}}/g, credentials.username))) shell.write(`${profiles[i].replace(/{{USER}}/g, credentials.username)}\r`);
+                                if (existsSync(profiles[i].replace(/{{USER}}/g, credentials.username))) shell.write(` ${profiles[i].replace(/{{USER}}/g, credentials.username)}\r`);
                             }
 
                             let motd: string | undefined;
@@ -181,34 +171,29 @@ export default class Shell {
                             }, 1000);
 
                             shell.onData((data: any) => {
-                                if (!this.hide) socket.emit("shell_output", data);
+                                if (!this.hide) {
+                                    if (Shell.exiting(data)) {
+                                        socket.emit("shell_exit");
+                                    } else {
+                                        socket.emit("shell_output", data);
+                                    }
+                                }
                             });
 
-                            shell.onExit(() => {
-                                socket.emit("shell_exit");
-                            });
+                            shell.onExit(() => socket.emit("shell_exit"));
 
-                            socket.on("shell_input", (data: any): void => {
-                                shell.write(`${data}`);
-                            });
+                            socket.on("shell_input", (data: any): void => shell.write(`${data}`));
 
                             socket.on("shell_resize", (data: any): void => {
                                 const parts = `${data}`.split(":");
 
-                                if (parts.length === 2 && !Number.isNaN(parseInt(parts[0], 10)) && !Number.isNaN(parseInt(parts[1], 10))) {
-                                    shell.resize(
-                                        parseInt(parts[0], 10),
-                                        parseInt(parts[1], 10),
-                                    );
-                                }
+                                if (parts.length === 2 && !Number.isNaN(parseInt(parts[0], 10)) && !Number.isNaN(parseInt(parts[1], 10))) shell.resize(parseInt(parts[0], 10), parseInt(parts[1], 10));
                             });
 
-                            socket.on("shell_clear", (): void => {
-                                shell.write("clear\r");
-                            });
+                            socket.on("shell_clear", (): void => shell.write(" clear\r"));
 
                             socket.on("shell_disconnect", (): void => {
-                                shell.write("exit\r");
+                                shell.write(" exit\r");
                                 shell.kill();
                             });
 
@@ -227,10 +212,27 @@ export default class Shell {
         return ((execSync(`groups ${username}`).toString().trim().split(":") || []).pop() || "").trim().split(" ").filter((item) => item !== username);
     }
 
+    static exiting(value: any): boolean {
+        if (!value) return false;
+
+        let data = (value || "").toString();
+
+        data = data.toLowerCase();
+        data = data.replace("\r", "{{RETURN}}");
+        data = data.replace("\n", "{{NEWLINE}}");
+        data = data.trim();
+
+        if (!data.startsWith("exit")) return false;
+        if (data === "exit{{RETURN}}{{NEWLINE}}") return true;
+        if (data === "exit{{NEWLINE}}{{RETURN}}") return true;
+        if (data === "exit{{NEWLINE}}") return true;
+        if (data === "exit{{RETURN}}") return true;
+
+        return false;
+    }
+
     static issue(): string {
-        if (existsSync("/etc/issue")) {
-            return Shell.getty(readFileSync("/etc/issue").toString());
-        }
+        if (existsSync("/etc/issue")) return Shell.getty(readFileSync("/etc/issue").toString());
 
         return "";
     }

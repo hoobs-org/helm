@@ -130,44 +130,46 @@ class Shell {
         this.issue = issue;
         this.term.open(this.shell);
         this.resize();
-        this.message(this.issue);
+        this.message(this.issue, " ");
         this.prompt();
         this.term.focus();
     }
 
-    message(value) {
-        if (value && value !== "") {
-            const lines = value.split("\n");
+    message(...value) {
+        const messages = value.join("");
+
+        if (messages && messages !== "") {
+            const lines = messages.split("\n");
+
+            let last;
 
             for (let i = 0; i < lines.length; i += 1) {
                 let line = lines[i];
 
-                line = line.replace(/{{DATE}}/gm, (new Date()).toLocaleDateString());
-                line = line.replace(/{{TIME}}/gm, (new Date()).toLocaleTimeString());
+                if (last === undefined || line !== last) {
+                    line = line.replace(/{{DATE}}/gm, (new Date()).toLocaleDateString());
+                    line = line.replace(/{{TIME}}/gm, (new Date()).toLocaleTimeString());
 
-                this.term.write(`${i > 0 ? "\r\n" : ""}${line}`);
+                    this.term.write(`${i > 0 ? "\r\n" : ""}${line}`);
+                }
+
+                last = line;
             }
         }
     }
 
     listners() {
         this.on("authenticated", (motd) => {
+            this.term.setOption("disableStdin", false);
             this.resize();
-            this.message(this.issue);
-            this.message(motd);
-
-            this.socket.on("shell_output", (data) => {
-                if (data.toString().trim() === "exit") {
-                    this.disconnect();
-                } else {
-                    this.term.write(data);
-                }
-            });
-
+            this.message(this.issue, motd);
+            this.socket.on("shell_output", (data) => this.term.write(data));
             this.authenticated = true;
         });
 
         this.on("reset_fields", () => {
+            this.term.setOption("disableStdin", false);
+
             this.term.write("\x1B[2K");
             this.term.write("\x1B[A");
             this.term.write("\x1B[2K");
@@ -189,25 +191,16 @@ class Shell {
         });
 
         this.on("change_password", () => {
+            this.term.setOption("disableStdin", false);
             this.term.write("\r\nNew Password: ");
             this.field = "new_password";
         });
 
-        this.on("unauthorized", () => {
-            this.disconnect();
-        });
+        this.on("unauthorized", () => this.disconnect());
+        this.on("shell_exit", () => this.disconnect());
 
-        this.on("shell_exit", () => {
-            this.disconnect();
-        });
-
-        window.addEventListener("resize", () => {
-            this.resize();
-        }, true);
-
-        window.onunload = () => {
-            this.disconnect();
-        };
+        window.addEventListener("resize", () => this.resize(), true);
+        window.onunload = () => this.disconnect();
 
         this.term.onData((data) => {
             if (this.authenticated) {
@@ -301,9 +294,7 @@ class Shell {
 
     on(event, callback) {
         this.off(event);
-
         this.events[event] = callback;
-
         this.socket.on(event, this.events[event]);
     }
 
@@ -323,6 +314,7 @@ class Shell {
 
             case "password":
                 this.field = undefined;
+                this.term.setOption("disableStdin", true);
                 this.socket.emit("shell_connect", this.credentials);
                 break;
 
@@ -334,6 +326,7 @@ class Shell {
             case "confirm_password":
                 this.field = undefined;
                 this.field = "confirm_password";
+                this.term.setOption("disableStdin", true);
                 this.socket.emit("shell_connect", this.credentials);
                 break;
 

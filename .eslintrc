@@ -10,8 +10,9 @@
         "project": "./tsconfig.json"
     },
     "ignorePatterns": [
-        "bin/",
-        "lib/"
+        "var/",
+        "cache/",
+        "main"
     ],
     "rules": {
         "quotes": [

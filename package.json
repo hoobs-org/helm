@@ -1,6 +1,6 @@
 {
     "name": "helm",
-    "version": "1.2.7",
+    "version": "2.1.1",
     "description": "Recovery and remote terminal for the Raspberry Pi.",
     "license": "GPL-3.0",
     "repository": {
