@@ -72,6 +72,18 @@ export default class Shell {
         this.io = new IO.Server(this.server, { cors: { origin: "*", credentials: false } });
 
         this.io?.on("connection", (socket: IO.Socket): void => {
+            socket.on("restart", (credentials: any) => {
+                Pam.authenticate(credentials.username, credentials.password, (status: any) => {
+                    if (!status) execSync("shurdown -r now");
+                });
+            });
+
+            socket.on("shutdown", (credentials: any) => {
+                Pam.authenticate(credentials.username, credentials.password, (status: any) => {
+                    if (!status) execSync("shurdown -h now");
+                });
+            });
+
             socket.on("shell_connect", (credentials: any) => {
                 Pam.authenticate(credentials.username, credentials.password, (status: any) => {
                     if (status) {
