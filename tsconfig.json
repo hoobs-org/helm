@@ -23,6 +23,7 @@
     ],
     "exclude": [
         "**/*.test.js",
+        "var/",
         "cache/*",
         "debug",
         "main"

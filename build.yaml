@@ -155,7 +155,7 @@ steps:
 
   - chroot: /
     shell: |
-      (cd /var/build/usr/lib/helm && npm install)
+      (cd /var/build/usr/lib/helm && npm install --unsafe-perm)
       (cd /var && dpkg-deb --build build)
 
   - shell: |

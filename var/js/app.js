@@ -2,6 +2,7 @@ class Shell {
     constructor(selector) {
         this.element = document.querySelector(selector);
         this.authenticated = false;
+        this.issue = "";
 
         this.style("/css/xterm.css");
         this.style("/css/xterm-extra.css");
@@ -16,6 +17,8 @@ class Shell {
         this.credentials = {
             username: "",
             password: "",
+            newPassword: "",
+            confirmPassword: "",
         };
 
         Promise.all(waits).then(() => {
@@ -119,29 +122,39 @@ class Shell {
         this.term.loadAddon(new WebLinksAddon.WebLinksAddon());
 
         this.listners();
-        this.open();
+
+        fetch("/issue").then((response) => response.text().then((data) => this.open(data)).catch(() => this.open())).catch(() => this.open());
     }
 
-    open() {
+    open(issue) {
+        this.issue = issue;
         this.term.open(this.shell);
         this.resize();
-        this.term.write(`${navigator.userAgent || navigator.vendor}\r\n`);
-        this.term.write("\r\n");
+        this.message(this.issue);
         this.prompt();
         this.term.focus();
+    }
+
+    message(value) {
+        if (value && value !== "") {
+            const lines = value.split("\n");
+
+            for (let i = 0; i < lines.length; i += 1) {
+                let line = lines[i];
+
+                line = line.replace(/{{DATE}}/gm, (new Date()).toLocaleDateString());
+                line = line.replace(/{{TIME}}/gm, (new Date()).toLocaleTimeString());
+
+                this.term.write(`${i > 0 ? "\r\n" : ""}${line}`);
+            }
+        }
     }
 
     listners() {
         this.on("authenticated", (motd) => {
             this.resize();
-
-            if (motd) {
-                const lines = motd.split("\n");
-
-                for (let i = 0; i < lines.length; i += 1) {
-                    this.term.write(`${i > 0 ? "\r\n" : ""}${lines[i]}`);
-                }
-            }
+            this.message(this.issue);
+            this.message(motd);
 
             this.socket.on("shell_output", (data) => {
                 if (data.toString().trim() === "exit") {
@@ -152,6 +165,32 @@ class Shell {
             });
 
             this.authenticated = true;
+        });
+
+        this.on("reset_fields", () => {
+            this.term.write("\x1B[2K");
+            this.term.write("\x1B[A");
+            this.term.write("\x1B[2K");
+            this.term.write("\x1B[A");
+            this.term.write("\x1B[2K");
+            this.term.write("\x1B[A");
+            this.term.write("\x1B[2K");
+            this.term.write("\x1B[A");
+            this.term.write("\x1B[2K");
+            this.term.write("\x1B[A");
+            this.term.write("\x1B[2K");
+
+            this.term.write("\r");
+
+            this.credentials.username = "";
+            this.credentials.password = "";
+            this.credentials.newPassword = "";
+            this.credentials.confirmPassword = "";
+        });
+
+        this.on("change_password", () => {
+            this.term.write("\r\nNew Password: ");
+            this.field = "new_password";
         });
 
         this.on("unauthorized", () => {
@@ -201,6 +240,26 @@ class Shell {
                                 }
 
                                 break;
+
+                            case "new_password":
+                                if (this.term._core.buffer.x > 14) {
+                                    this.term.write("\b");
+                                    this.term.write(" ");
+                                    this.term.write("\b");
+                                    this.credentials.newPassword = this.credentials.password.slice(0, -1);
+                                }
+
+                                break;
+
+                            case "confirm_password":
+                                if (this.term._core.buffer.x > 18) {
+                                    this.term.write("\b");
+                                    this.term.write(" ");
+                                    this.term.write("\b");
+                                    this.credentials.confirmPassword = this.credentials.password.slice(0, -1);
+                                }
+
+                                break;
                         }
 
                         break;
@@ -215,6 +274,16 @@ class Shell {
                             case "password":
                                 this.term.write("*");
                                 this.credentials.password += data;
+                                break;
+
+                            case "new_password":
+                                this.term.write("*");
+                                this.credentials.newPassword += data;
+                                break;
+
+                            case "confirm_password":
+                                this.term.write("*");
+                                this.credentials.confirmPassword += data;
                                 break;
                         }
 
@@ -253,18 +322,19 @@ class Shell {
                 break;
 
             case "password":
-                this.term.write("\x1B[2K");
-                this.term.write("\x1B[A");
-                this.term.write("\x1B[2K");
-                this.term.write("\x1B[A");
-                this.term.write("\x1B[2K");
-                this.term.write("\x1B[A");
-                this.term.write("\x1B[2K");
-                this.term.write("\r");
                 this.field = undefined;
                 this.socket.emit("shell_connect", this.credentials);
-                this.credentials.username = "";
-                this.credentials.password = "";
+                break;
+
+            case "new_password":
+                this.term.write("\r\nConfirm Password: ");
+                this.field = "confirm_password";
+                break;
+
+            case "confirm_password":
+                this.field = undefined;
+                this.field = "confirm_password";
+                this.socket.emit("shell_connect", this.credentials);
                 break;
 
             default:

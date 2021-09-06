@@ -23,6 +23,8 @@ import { execSync } from "child_process";
 import State from "./state";
 import Shell from "./shell";
 
+let shell: Shell | undefined;
+
 export = function Daemon(): void {
     Program.version(State.version, "-v, --version", "output the current version");
     Program.allowUnknownOption();
@@ -33,8 +35,7 @@ export = function Daemon(): void {
         .description("start the helm service")
         .option("-p, --port <port>", "change the port the hub runs on")
         .action((command) => {
-            const shell = new Shell(command.port);
-
+            shell = new Shell(command.port);
             shell.start();
         });
 
@@ -65,3 +66,17 @@ export = function Daemon(): void {
 
     Program.parse(process.argv);
 };
+
+function teardown() {
+    if (shell) {
+        shell.stop().then(() => process.exit());
+    } else {
+        process.exit();
+    }
+}
+
+process.on("exit", teardown);
+process.on("SIGINT", teardown);
+process.on("SIGTERM", teardown);
+process.on("SIGUSR1", teardown);
+process.on("SIGUSR2", teardown);
