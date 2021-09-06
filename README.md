@@ -1,4 +1,5 @@
-# HelM
+# ![](https://raw.githubusercontent.com/hoobs-org/HOOBS/master/docs/logo.png)
+
 Recovery and remote terminal for the Raspberry Pi.
 
 ![](https://raw.githubusercontent.com/hoobs-org/helm/main/screenshot.png)
