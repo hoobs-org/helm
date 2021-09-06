@@ -1,4 +1,4 @@
 #!/bin/sh
 
-deb-systemd-helper enable 'helm.service' > /dev/null || true
+systemctl enable helm.service
 systemctl start helm.service
