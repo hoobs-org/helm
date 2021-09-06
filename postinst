@@ -1,9 +1,4 @@
 #!/bin/sh
 
-if deb-systemd-helper --quiet was-enabled 'helm.service'; then
-    deb-systemd-helper enable 'helm.service' > /dev/null || true
-else
-    deb-systemd-helper update-state 'helm.service' > /dev/null || true
-fi
-
+deb-systemd-helper enable 'helm.service' > /dev/null || true
 systemctl start helm.service
