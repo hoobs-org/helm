@@ -1,4 +1,4 @@
 #!/bin/sh
 
-systemctl enable helm.service
-systemctl start helm.service
+systemctl enable helm.service || true
+systemctl start helm.service || true
