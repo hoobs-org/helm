@@ -84,7 +84,7 @@ paths:
 	mkdir -p cache
 
 package:
-	node -e 'const pjson = require("./package.json"); delete pjson.scripts; delete pjson.devDependencies; delete pjson.engines; require("fs").writeFileSync("cache/package.json", JSON.stringify(pjson, null, 4));'
+	node -e 'const pjson = require("./package.json"); delete pjson.devDependencies; delete pjson.engines; require("fs").writeFileSync("cache/package.json", JSON.stringify(pjson, null, 4));'
 
 build:
 	./node_modules/.bin/tsc

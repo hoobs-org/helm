@@ -22,7 +22,7 @@ debug() {
 }
 
 include() {
-    if [[ -f "../repo/debian/pool/main/h/helm/helm$2_$3.deb" ]]; then
+    if [[ -f "../repo/debian/pool/main/h/helm/helm_$2_$3.deb" ]]; then
         echo "$2-$3 already published"
     else
         case $1 in
