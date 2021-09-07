@@ -92,11 +92,16 @@ steps:
   - chroot: /
     shell: |
       curl -s https://deb.nodesource.com/gpgkey/nodesource.gpg.key | gpg --dearmor | tee /usr/share/keyrings/nodesource.gpg > /dev/null
+      curl -s https://dl.yarnpkg.com/debian/pubkey.gpg | gpg --dearmor | tee /usr/share/keyrings/yarn.gpg > /dev/null
 
   - create-file: /etc/apt/sources.list.d/nodesource.list
     contents: |
       deb [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/__NODE_REPO__ __RELEASE__ main
       deb-src [signed-by=/usr/share/keyrings/nodesource.gpg] https://deb.nodesource.com/__NODE_REPO__ __RELEASE__ main
+
+  - create-file: /etc/apt/sources.list.d/yarn.list
+    contents: |
+      deb [signed-by=/usr/share/keyrings/yarn.gpg] https://dl.yarnpkg.com/debian stable main
 
   - chroot: /
     shell: |
@@ -106,6 +111,7 @@ steps:
     packages:
     - libpam-dev
     - nodejs
+    - yarn
     tag: /
 
   - copy-file: /var/build/usr/lib/systemd/system/helm.service
@@ -136,7 +142,7 @@ steps:
   - chroot: /
     shell: |
       npm cache clean --force
-      (cd /var/build/usr/lib/helm && npm install --unsafe-perm)
+      (cd /var/build/usr/lib/helm && yarn install --unsafe-perm)
       (cd /var && dpkg-deb --build build)
 
   - shell: |
