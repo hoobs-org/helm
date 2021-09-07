@@ -4,11 +4,13 @@ COUNT=0
 
 version() {
     case $1 in
-        nodesource )  echo `node -e 'console.log(require("./package.json").engines.nodesource)'`
-                      ;;
+        nodesource )
+            echo `node -e 'console.log(require("./package.json").engines.nodesource)'`
+            ;;
 
-        * )           echo `node -e 'console.log(require("./package.json").version)'`
-                      ;;
+        * )
+            echo `node -e 'console.log(require("./package.json").version)'`
+            ;;
     esac
 }
 
@@ -24,19 +26,20 @@ include() {
         echo "$2-$3 already published"
     else
         case $1 in
-            stable )    reprepro -b ../repo/debian includedeb bleeding builds/helm-$2-hoobs-$3.deb
-                        reprepro -b ../repo/debian includedeb edge builds/helm-$2-hoobs-$3.deb
-                        reprepro -b ../repo/debian includedeb stable builds/helm-$2-hoobs-$3.deb
-                        ;;
+            stable )
+                reprepro -b ../repo/debian includedeb bleeding builds/helm-$2-hoobs-$3.deb
+                reprepro -b ../repo/debian includedeb edge builds/helm-$2-hoobs-$3.deb
+                reprepro -b ../repo/debian includedeb stable builds/helm-$2-hoobs-$3.deb
+                ;;
 
-            edge )      reprepro -b ../repo/debian includedeb bleeding builds/helm-$2-hoobs-$3.deb
-                        reprepro -b ../repo/debian includedeb edge builds/helm-$2-hoobs-$3.deb
-                        ;;
+            edge )
+                reprepro -b ../repo/debian includedeb bleeding builds/helm-$2-hoobs-$3.deb
+                reprepro -b ../repo/debian includedeb edge builds/helm-$2-hoobs-$3.deb
+                ;;
 
-            bleeding )  reprepro -b ../repo/debian includedeb bleeding builds/helm-$2-hoobs-$3.deb
-                        ;;
-
-            * )         ;;
+            bleeding )
+                reprepro -b ../repo/debian includedeb bleeding builds/helm-$2-hoobs-$3.deb
+                ;;
         esac
     fi
 }
@@ -45,43 +48,49 @@ publish() {
     current=$(version)
 
     case $1 in
-        stable )    include "stable" "$current" "amd64"
-                    include "stable" "$current" "arm64"
-                    include "stable" "$current" "armhf"
-                    ;;
+        stable )
+            include "stable" "$current" "amd64"
+            include "stable" "$current" "arm64"
+            include "stable" "$current" "armhf"
+            ;;
 
-        edge )      include "edge" "$current" "amd64"
-                    include "edge" "$current" "arm64"
-                    include "edge" "$current" "armhf"
-                    ;;
+        edge )
+            include "edge" "$current" "amd64"
+            include "edge" "$current" "arm64"
+            include "edge" "$current" "armhf"
+            ;;
 
-        bleeding )  include "bleeding" "$current" "amd64"
-                    include "bleeding" "$current" "arm64"
-                    include "bleeding" "$current" "armhf"
-                    ;;
+        bleeding )
+            include "bleeding" "$current" "amd64"
+            include "bleeding" "$current" "arm64"
+            include "bleeding" "$current" "armhf"
+            ;;
 
-        list )      list $2
-                    ;;
-
-        * )         ;;
+        list )
+            list $2
+            ;;
     esac
 }
 
 list() {
     case $1 in
-        stable )    reprepro -b ../repo/debian list stable helm
-                    ;;
+        stable )
+            reprepro -b ../repo/debian list stable helm
+            ;;
 
-        edge )      reprepro -b ../repo/debian list edge helm
-                    ;;
+        edge )
+            reprepro -b ../repo/debian list edge helm
+            ;;
 
-        bleeding )  reprepro -b ../repo/debian list bleeding helm
-                    ;;
+        bleeding )
+            reprepro -b ../repo/debian list bleeding helm
+            ;;
 
-        * )         reprepro -b ../repo/debian list stable helm
-                    reprepro -b ../repo/debian list edge helm
-                    reprepro -b ../repo/debian list bleeding helm
-                    ;;
+        * )
+            reprepro -b ../repo/debian list stable helm
+            reprepro -b ../repo/debian list edge helm
+            reprepro -b ../repo/debian list bleeding helm
+            ;;
     esac
 }
 
@@ -110,23 +119,27 @@ build () {
 }
 
 case $1 in
-    version )  version $2
-               ;;
+    version )
+        version $2
+        ;;
 
-    lint )     make lint
-               ;;
+    lint )
+        make lint
+        ;;
 
-    debug )    debug
-               ;;
+    debug )
+        debug
+        ;;
 
-    build )    build
-               ;;
+    build )
+        build
+        ;;
 
-    publish )  publish $2 $3
-               ;;
+    publish )
+        publish $2 $3
+        ;;
 
-    clean )    make clean
-               ;;
-
-    * )        ;;
+    clean )
+        make clean
+        ;;
 esac
