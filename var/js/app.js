@@ -3,6 +3,13 @@ class Shell {
         this.element = document.querySelector(selector);
         this.authenticated = false;
         this.issue = "";
+        this.frame = false;
+
+        try {
+            this.frame = window.self !== window.top;
+        } catch (_error) {
+            this.frame = true;
+        }
 
         this.style("/css/xterm.css");
         this.style("/css/xterm-extra.css");
@@ -130,7 +137,7 @@ class Shell {
         this.issue = issue;
         this.term.open(this.shell);
         this.resize();
-        this.message(this.issue, " ");
+        this.message(this.issue, this.frame ? "\x1b[1;33mthis is your terminal login, it is different then then the interface\x1b[0m\n \n" : " ");
         this.prompt();
         this.term.focus();
     }
@@ -170,6 +177,10 @@ class Shell {
         this.on("reset_fields", () => {
             this.term.setOption("disableStdin", false);
 
+            this.term.write("\x1B[2K");
+            this.term.write("\x1B[A");
+            this.term.write("\x1B[2K");
+            this.term.write("\x1B[A");
             this.term.write("\x1B[2K");
             this.term.write("\x1B[A");
             this.term.write("\x1B[2K");
