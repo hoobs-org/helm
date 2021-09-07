@@ -109,7 +109,7 @@ image() {
     COUNT=$((COUNT+1))
 }
 
-build () {
+build() {
     touch build.log
     truncate -s 0 build.log
 
