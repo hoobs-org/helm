@@ -6,21 +6,18 @@ endif
 
 helm-amd64: clean lint paths package build helm-amd64.yaml
 	time nice $(as_root) vmdb2 --verbose cache/amd64.yaml --output=cache/amd64.img --log build.log
-	$(as_root) chown $(shell whoami):$(shell whoami) cache/amd64.tar.gz
 	$(as_root) chown $(shell whoami):$(shell whoami) builds/helm-$(shell project version)-hoobs-amd64.deb
 	dpkg-sig --sign builder builds/helm-$(shell project version)-hoobs-amd64.deb
 	rm -fR cache
 
 helm-arm64: clean lint paths package build helm-arm64.yaml
 	time nice $(as_root) vmdb2 --verbose cache/arm64.yaml --output=cache/arm64.img --log build.log
-	$(as_root) chown $(shell whoami):$(shell whoami) cache/arm64.tar.gz
 	$(as_root) chown $(shell whoami):$(shell whoami) builds/helm-$(shell project version)-hoobs-arm64.deb
 	dpkg-sig --sign builder builds/helm-$(shell project version)-hoobs-arm64.deb
 	rm -fR cache
 
 helm-armhf: clean lint paths package build helm-armhf.yaml
 	time nice $(as_root) vmdb2 --verbose cache/armhf.yaml --output=cache/armhf.img --log build.log
-	$(as_root) chown $(shell whoami):$(shell whoami) cache/armhf.tar.gz
 	$(as_root) chown $(shell whoami):$(shell whoami) builds/helm-$(shell project version)-hoobs-armhf.deb
 	dpkg-sig --sign builder builds/helm-$(shell project version)-hoobs-armhf.deb
 	rm -fR cache
