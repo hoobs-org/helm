@@ -25,7 +25,14 @@ import Pam from "@hoobs/pam";
 import { join } from "path";
 import { Express } from "express-serve-static-core";
 import { execSync } from "child_process";
-import { existsSync, readFileSync, readdirSync } from "fs-extra";
+
+import {
+    existsSync,
+    readFileSync,
+    readdirSync,
+    readJsonSync,
+} from "fs-extra";
+
 import { createHttpTerminator, HttpTerminator } from "http-terminator";
 import { spawn, IPty } from "node-pty";
 
@@ -123,11 +130,19 @@ export default class Shell {
                             socket.emit("reset_fields");
 
                             const { env } = process;
+                            const paths = (env.PATH || "").split(":");
+
+                            if (paths.indexOf(".") === -1) paths.unshift(".");
+
+                            if (existsSync("/var/lib/hoobs/bridges.conf")) {
+                                paths.push(...(readJsonSync("/var/lib/hoobs/bridges.conf", { throws: false }) || []).map((item: any) => join(item.plugins, ".bin")).filter((item: string) => existsSync(item)));
+                            }
 
                             env.SHELL = existsSync("/bin/bash") ? "/bin/bash" : process.env.SHELL || "sh";
                             env.MAIL = `/var/mail/${credentials.username}`;
                             env.USER = credentials.username;
                             env.HOME = `/home/${credentials.username}`;
+                            env.PATH = paths.join(":");
                             env.PWD = env.HOME;
                             env.LOGNAME = credentials.username;
 

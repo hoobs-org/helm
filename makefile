@@ -4,38 +4,26 @@ else
 	as_root = sudo
 endif
 
-helm-amd64: reset lint paths package build helm-amd64.yaml
-	time nice $(as_root) vmdb2 --verbose cache/amd64.yaml --rootfs-tarball=cache/amd64.tar.gz --output=cache/amd64.img --log build.log
+helm-amd64: clean lint paths package build helm-amd64.yaml
+	time nice $(as_root) vmdb2 --verbose cache/amd64.yaml --output=cache/amd64.img --log build.log
 	$(as_root) chown $(shell whoami):$(shell whoami) cache/amd64.tar.gz
 	$(as_root) chown $(shell whoami):$(shell whoami) builds/helm-$(shell project version)-hoobs-amd64.deb
 	dpkg-sig --sign builder builds/helm-$(shell project version)-hoobs-amd64.deb
-	rm -fR cache/helm
-	rm -f cache/package.json
-	rm -f cache/control
-	rm -f cache/amd64.yaml
-	rm -f cache/amd64.img
+	rm -fR cache
 
-helm-arm64: reset lint paths package build helm-arm64.yaml
-	time nice $(as_root) vmdb2 --verbose cache/arm64.yaml --rootfs-tarball=cache/arm64.tar.gz --output=cache/arm64.img --log build.log
+helm-arm64: clean lint paths package build helm-arm64.yaml
+	time nice $(as_root) vmdb2 --verbose cache/arm64.yaml --output=cache/arm64.img --log build.log
 	$(as_root) chown $(shell whoami):$(shell whoami) cache/arm64.tar.gz
 	$(as_root) chown $(shell whoami):$(shell whoami) builds/helm-$(shell project version)-hoobs-arm64.deb
 	dpkg-sig --sign builder builds/helm-$(shell project version)-hoobs-arm64.deb
-	rm -fR cache/helm
-	rm -f cache/package.json
-	rm -f cache/control
-	rm -f cache/arm64.yaml
-	rm -f cache/arm64.img
+	rm -fR cache
 
-helm-armhf: reset lint paths package build helm-armhf.yaml
-	time nice $(as_root) vmdb2 --verbose cache/armhf.yaml --rootfs-tarball=cache/armhf.tar.gz --output=cache/armhf.img --log build.log
+helm-armhf: clean lint paths package build helm-armhf.yaml
+	time nice $(as_root) vmdb2 --verbose cache/armhf.yaml --output=cache/armhf.img --log build.log
 	$(as_root) chown $(shell whoami):$(shell whoami) cache/armhf.tar.gz
 	$(as_root) chown $(shell whoami):$(shell whoami) builds/helm-$(shell project version)-hoobs-armhf.deb
 	dpkg-sig --sign builder builds/helm-$(shell project version)-hoobs-armhf.deb
-	rm -fR cache/helm
-	rm -f cache/package.json
-	rm -f cache/control
-	rm -f cache/armhf.yaml
-	rm -f cache/armhf.img
+	rm -fR cache
 
 helm-amd64.yaml:
 	cat build.yaml | \
@@ -89,17 +77,6 @@ package:
 build:
 	./node_modules/.bin/tsc
 	cp -R var cache/helm/static
-
-reset:
-	rm -fR cache/helm
-	rm -f cache/package.json
-	rm -f cache/control
-	rm -f cache/amd64.yaml
-	rm -f cache/arm64.yaml
-	rm -f cache/armhf.yaml
-	rm -f cache/amd64.img
-	rm -f cache/arm64.img
-	rm -f cache/armhf.img
 
 clean:
 	rm -fR cache

@@ -15,7 +15,7 @@ version() {
 }
 
 debug() {
-    make reset
+    make clean
     make build
 
     sudo ./debug -d
