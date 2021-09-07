@@ -141,7 +141,6 @@ steps:
 
   - chroot: /
     shell: |
-      npm cache clean --force
       (cd /var/build/usr/lib/helm && yarn install --unsafe-perm)
       (cd /var && dpkg-deb --build build)
 
