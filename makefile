@@ -74,6 +74,7 @@ package:
 build:
 	./node_modules/.bin/tsc
 	cp -R var cache/helm/static
+	cp LICENSE cache/helm/
 
 clean:
 	rm -fR cache
