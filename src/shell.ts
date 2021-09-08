@@ -135,7 +135,14 @@ export default class Shell {
                             if (paths.indexOf(".") === -1) paths.unshift(".");
 
                             if (existsSync("/var/lib/hoobs/bridges.conf")) {
-                                paths.push(...(readJsonSync("/var/lib/hoobs/bridges.conf", { throws: false }) || []).map((item: any) => join(item.plugins, ".bin")).filter((item: string) => existsSync(item)));
+                                paths.push(...(readJsonSync(
+                                    "/var/lib/hoobs/bridges.conf",
+                                    { throws: false },
+                                ) || []).map((item: any) => join(
+                                    "/var/lib/hoobs",
+                                    item.id,
+                                    "node_modules/.bin",
+                                )).filter((item: string) => existsSync(item)));
                             }
 
                             env.SHELL = existsSync("/bin/bash") ? "/bin/bash" : process.env.SHELL || "sh";
