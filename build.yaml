@@ -131,7 +131,7 @@ steps:
   - shell: |
       rm -fR "${ROOT?}/var/build/usr/lib/helm"
       cp -R cache/helm "${ROOT?}/var/build/usr/lib/"
-      cp -R cache/package.json "${ROOT?}/var/build/usr/lib/helm"
+      cp -R cache/package.json "${ROOT?}/var/build/usr/lib/helm/"
     root-fs: /
 
   - chroot: /
