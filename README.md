@@ -8,7 +8,7 @@ Recovery and remote terminal for the Raspberry Pi.
 
 First add the HOOBS repository to your sources.
 ```
-wget -qO- https://support.hoobs.org/setup | sudo -E bash -
+wget -qO- https://support.hoobs.org/setup | sudo bash -
 ```
 
 Then install HelM.
