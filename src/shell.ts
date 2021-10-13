@@ -18,7 +18,6 @@
 
 import HTTP from "http";
 import Server from "express";
-import Compression from "compression";
 import IO from "socket.io";
 import CORS from "cors";
 import Pam from "@hoobs/pam";
@@ -68,7 +67,6 @@ export default class Shell {
     constructor(port: number | undefined) {
         this.port = port || 9090;
         this.app = Server();
-        this.app.use(Compression());
         this.running = false;
         this.shells = [];
         this.hide = false;
