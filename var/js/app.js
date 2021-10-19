@@ -137,7 +137,7 @@ class Shell {
         this.issue = issue;
         this.term.open(this.shell);
         this.resize();
-        this.message(this.issue, this.frame ? "\x1b[1;33mthis is your terminal login, it is different then then the interface\x1b[0m\n \n" : " ");
+        this.message(this.issue, this.frame ? "\x1b[1;33mThis is your terminal login, it is different than the interface\x1b[0m\n \n" : " ");
         this.prompt();
         this.term.focus();
     }
