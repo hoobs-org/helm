@@ -238,6 +238,7 @@ export default class Shell {
 
         this.app.use("/", Server.static(join(__dirname, "static")));
         this.app.use("/issue", (_request, response) => response.send(Shell.issue()));
+        this.app.use("*", (_request, response) => response.send(""));
     }
 
     groups(username: string): string[] {
