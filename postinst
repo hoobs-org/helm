@@ -1,5 +1,9 @@
 #!/bin/sh
 
+if [ -f /etc/apt/sources.list.d/nodesource.list ]; then
+    sed 's/node_14.x/node_16.x/g' /etc/apt/sources.list.d/nodesource.list | tee /etc/apt/sources.list.d/nodesource.list
+fi
+
 if [ "|$XDG_SESSION_TYPE|" != "||" ]; then
     systemctl enable helm.service || true
     systemctl stop helm.service || true
