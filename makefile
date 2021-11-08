@@ -32,7 +32,7 @@ helm-amd64.yaml:
 	sed "s/__NODE_REPO__/$(shell project version nodesource)/" > cache/amd64.yaml
 	cat control | \
 	sed "s/__VERSION__/$(shell project version)/" | \
-	sed "s/__DEPENDS__/nodejs (>= 14.15.0), libpam-dev, python3, make, gcc, g++/" | \
+	sed "s/__DEPENDS__/nodejs (>= 16.13.0), libpam-dev, python3, make, gcc, g++/" | \
 	sed "s/__ARCH__/amd64/" > cache/control
 
 helm-arm64.yaml:
@@ -45,7 +45,7 @@ helm-arm64.yaml:
 	sed "s/__NODE_REPO__/$(shell project version nodesource)/" > cache/arm64.yaml
 	cat control | \
 	sed "s/__VERSION__/$(shell project version)/" | \
-	sed "s/__DEPENDS__/nodejs (>= 14.15.0), libpam-dev, python3, make, gcc, g++/" | \
+	sed "s/__DEPENDS__/nodejs (>= 16.13.0), libpam-dev, python3, make, gcc, g++/" | \
 	sed "s/__ARCH__/arm64/" > cache/control
 
 helm-armhf.yaml:
@@ -58,7 +58,7 @@ helm-armhf.yaml:
 	sed "s/__NODE_REPO__/$(shell project version nodesource)/" > cache/armhf.yaml
 	cat control | \
 	sed "s/__VERSION__/$(shell project version)/" | \
-	sed "s/__DEPENDS__/nodejs (>= 14.15.0), libpam-dev, python3, make, gcc, g++/" | \
+	sed "s/__DEPENDS__/nodejs (>= 16.13.0), libpam-dev, python3, make, gcc, g++/" | \
 	sed "s/__ARCH__/armhf/" > cache/control
 
 lint:
