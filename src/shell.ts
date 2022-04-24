@@ -200,7 +200,7 @@ export default class Shell {
                                 this.hide = false;
 
                                 shell.write("\r");
-                            }, 1000);
+                            }, 3000);
 
                             shell.onData((data: any) => {
                                 if (!this.hide) {
