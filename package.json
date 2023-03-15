@@ -1,6 +1,6 @@
 {
     "name": "helm",
-    "version": "2.1.8",
+    "version": "2.1.9",
     "description": "Recovery and remote terminal for the Raspberry Pi.",
     "license": "GPL-3.0",
     "repository": {
@@ -15,7 +15,7 @@
         "name": "Michael J Kellsy"
     },
     "engines": {
-        "nodesource": "node_16.x"
+        "nodesource": "node_18.x"
     },
     "dependencies": {
         "@hoobs/pam": "^1.0.5",
